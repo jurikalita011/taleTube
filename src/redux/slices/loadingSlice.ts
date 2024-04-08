@@ -2,13 +2,8 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 interface State {
   isLoading: boolean;
-  error?: string | null;
+  error?: string | null; // will store string messages i.e. error.message
 }
-
-// type Action = {
-//   type: string;
-//   payload: boolean;
-// };
 
 const initialState: State = {
   isLoading: true,

@@ -25,7 +25,6 @@ function CheckUserDetails({
     return <></>;
   }
 
-  dispatch(setLoading(false));
   dispatch(
     setAuthState({
       isAuth: typeof user !== undefined && user !== undefined,
@@ -34,6 +33,7 @@ function CheckUserDetails({
       error,
     })
   );
+  dispatch(setLoading(false));
 
   if (
     !(
@@ -43,7 +43,7 @@ function CheckUserDetails({
       )
     )
   ) {
-    router.push("/login?redirectTo=dashboard");
+    router.replace("/api/auth/login?redirectTo=http://localhost:3000/");
     return <></>;
   }
 
