@@ -3,21 +3,30 @@
 import React from "react";
 import { useAppSelector } from "@/redux/hooks";
 import { useRouter } from "next/navigation";
-
-interface ProtectedRouteProps {
-  children: React.ReactNode;
-  roleLevel: number;
-}
+import CheckUserDetails from "./CheckUserDetails";
+import { ProtectedRouteProps, UserProfileInterface } from "./interfaces";
 
 function ProtectedRoute({ children, roleLevel }: ProtectedRouteProps) {
-  const { isAuth, isFirstTimeCheck } = useAppSelector((state) => state.auth);
+  const { isAuth, user, isInitialCheckWithAuth0Done } = useAppSelector(
+    (state) => state.auth
+  );
 
   const router = useRouter();
 
-  if (isAuth) {
+  if (
+    isAuth &&
+    typeof user !== undefined &&
+    (user as UserProfileInterface)["taletube_other/roles"].includes(roleLevel)
+  ) {
     return <>{children}</>;
   }
-  return router.push("/login?redirectTo=dashboard");
+
+  if (!isAuth && isInitialCheckWithAuth0Done) {
+    return router.push("/login?redirectTo=dashboard");
+  }
+
+  // if intial check has not been done yet then try to do that
+  return <CheckUserDetails roleLevel={roleLevel}>{children}</CheckUserDetails>;
 }
 
 export default ProtectedRoute;
