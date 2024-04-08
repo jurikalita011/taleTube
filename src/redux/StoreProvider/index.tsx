@@ -9,10 +9,6 @@ function StoreProvider({
 }: {
   children: React.ReactNode;
 }): React.ReactNode {
-  console.log(
-    "Somehow we are geting store provider without importing it. That means next js internally does this thing for us."
-  );
-
   const storeRef = useRef<AppStore>();
   if (!storeRef.current) {
     storeRef.current = makeStore();
