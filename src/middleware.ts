@@ -1,4 +1,3 @@
-import { UserProfile } from "@auth0/nextjs-auth0/client";
 import { Session, getSession } from "@auth0/nextjs-auth0/edge";
 import { NextRequest, NextResponse } from "next/server";
 import NodeCache from "node-cache";
@@ -22,11 +21,11 @@ export async function middleware(req: NextRequest) {
         userSession === undefined ||
         !userSession.user["taletube_other/roles"].includes("admin")
       ) {
-        return NextResponse.rewrite(new URL("/not-found", req.nextUrl));
+        return NextResponse.redirect(new URL("/not-found", req.nextUrl));
       }
     }
 
-    return NextResponse.next();
+    // return NextResponse.next();
   } catch (error) {
     console.error(error);
   }
