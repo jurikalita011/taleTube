@@ -6,7 +6,7 @@ interface State {
 }
 
 const initialState: State = {
-  isLoading: true,
+  isLoading: false,
   error: null,
 };
 

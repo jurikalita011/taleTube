@@ -4,7 +4,12 @@ import "./globals.css";
 
 // auth0
 import { UserProvider } from "@auth0/nextjs-auth0/client";
+
+// redux
 import StoreProvider from "@/redux/StoreProvider";
+
+// local components
+import LoadingComponent from "@/components/LoadingComponent";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,7 +31,10 @@ export default function RootLayout({
     <html lang="en">
       <UserProvider>
         <body className={inter.className}>
-          <StoreProvider>{children}</StoreProvider>
+          <StoreProvider>
+            <LoadingComponent />
+            <>{children}</>
+          </StoreProvider>
         </body>
       </UserProvider>
     </html>
