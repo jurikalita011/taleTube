@@ -1,7 +1,8 @@
+import { withPageAuthRequired } from "@auth0/nextjs-auth0/edge";
 import React from "react";
 
-function page() {
+async function page() {
   return <div>Protected Admin Route</div>;
 }
 
-export default page;
+export default withPageAuthRequired(page, { returnTo: "/add-story" });
