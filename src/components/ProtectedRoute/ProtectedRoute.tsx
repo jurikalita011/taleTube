@@ -10,7 +10,7 @@ function ProtectedRoute({ children, roleLevel }: ProtectedRouteProps) {
   const dispatch = useAppDispatch();
 
   const { isLoading, user, error } = React.useMemo<UserContext>(
-    () => useUser(),
+    () => useUser(), // its not reconmended to call hooks inside useMemo but still..
     []
   );
 
