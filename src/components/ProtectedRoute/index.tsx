@@ -2,24 +2,30 @@
 
 import React, { useEffect } from "react";
 import { ProtectedRouteProps, UserProfileInterface } from "./interfaces";
-import { UserContext, UserProfile, useUser } from "@auth0/nextjs-auth0/client";
+import { useUser } from "@auth0/nextjs-auth0/client";
 import { setError, setLoading } from "@/redux/slices/loadingSlice";
 import { useAppDispatch } from "@/redux/hooks";
+import Navigate from "../Navigate";
 
-function ProtectedRoute({ children, roleLevel }: ProtectedRouteProps) {
+function ProtectedRoute({
+  children,
+  roleLevel,
+  renderCustomComponent = undefined,
+}: ProtectedRouteProps) {
   const dispatch = useAppDispatch();
 
-  const { isLoading, user, error } = React.useMemo<UserContext>(
-    () => useUser(), // its not reconmended to call hooks inside useMemo but still..
-    []
-  );
+  const { isLoading, user, error } = useUser();
+
+  console.log(isLoading);
 
   useEffect(() => {
     dispatch(setLoading(isLoading));
   }, [isLoading]);
 
   useEffect(() => {
-    dispatch(setError(error?.message || ""));
+    if (!!error) {
+      dispatch(setError(error.message));
+    }
   }, [error]);
 
   if (isLoading) {
@@ -30,15 +36,15 @@ function ProtectedRoute({ children, roleLevel }: ProtectedRouteProps) {
     return <></>;
   }
 
-  if (!user) {
-    return <></>;
-  }
-
   if (
+    !user ||
     !(user as UserProfileInterface)["taletube_other/roles"]?.includes(roleLevel)
   ) {
-    return (
-      <a href="/api/auth/login?redirectTo=http://localhost:3000/">Log In</a>
+    return typeof renderCustomComponent !== undefined &&
+      renderCustomComponent !== undefined ? (
+      <>{renderCustomComponent}</>
+    ) : (
+      <Navigate to="/api/auth/login?redirectTo=http://localhost:3000/" />
     );
   }
 
