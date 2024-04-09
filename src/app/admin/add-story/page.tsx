@@ -2,6 +2,8 @@ import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import Image from "next/image";
 import React from "react";
 
+import UploadImageModel from "@/components/UploadImageModel";
+
 async function page() {
   return (
     <>
@@ -29,11 +31,14 @@ async function page() {
             <label className="text-[#4f4f4f] mb-2">Images</label>
             <div
               style={{
-                overflowX: "scroll",
+                WebkitOverflowScrolling: "touch",
               }}
-              className="flex items-center justify-center mb-4 gap-x-5 overflow-x-scroll h-fit py-5">
-              <div className="p-1 rounded-md bg-white border w-[300px] h-[300px]">
+              className="flex items-start mb-4 gap-x-5 overflow-x-auto scroll-snap-type-x-mandatory h-fit py-5">
+              <div className="p-1 rounded-md bg-white border scroll-snap-align-left">
                 <Image
+                  style={{
+                    maxWidth: 300,
+                  }}
                   src={
                     "https://cdn.penguin.co.uk/dam-assets/books/9781785299360/9781785299360-jacket-large.jpg"
                   }
@@ -45,8 +50,11 @@ async function page() {
                   alt="image-1"
                 />
               </div>
-              <div className="p-1 rounded-md bg-white border">
+              <div className="p-1 rounded-md bg-white border scroll-snap-align-left">
                 <Image
+                  style={{
+                    maxWidth: 300,
+                  }}
                   src={
                     "https://cdn.penguin.co.uk/dam-assets/books/9781785299360/9781785299360-jacket-large.jpg"
                   }
@@ -58,8 +66,11 @@ async function page() {
                   alt="image-1"
                 />
               </div>
-              <div className="p-1 rounded-md bg-white border">
+              <div className="p-1 rounded-md bg-white border scroll-snap-align-left">
                 <Image
+                  style={{
+                    maxWidth: 300,
+                  }}
                   src={
                     "https://cdn.penguin.co.uk/dam-assets/books/9781785299360/9781785299360-jacket-large.jpg"
                   }
@@ -71,47 +82,11 @@ async function page() {
                   alt="image-1"
                 />
               </div>
-              <div className="p-1 rounded-md bg-white border">
+              <div className="p-1 rounded-md bg-white border scroll-snap-align-left">
                 <Image
-                  src={
-                    "https://cdn.penguin.co.uk/dam-assets/books/9781785299360/9781785299360-jacket-large.jpg"
-                  }
-                  height={300}
-                  width={300}
-                  className="w-[300px] h-[300px]"
-                  objectFit="cover"
-                  objectPosition="center"
-                  alt="image-1"
-                />
-              </div>
-              <div className="p-1 rounded-md bg-white border">
-                <Image
-                  src={
-                    "https://cdn.penguin.co.uk/dam-assets/books/9781785299360/9781785299360-jacket-large.jpg"
-                  }
-                  height={300}
-                  width={300}
-                  className="w-[300px] h-[300px]"
-                  objectFit="cover"
-                  objectPosition="center"
-                  alt="image-1"
-                />
-              </div>
-              <div className="p-1 rounded-md bg-white border">
-                <Image
-                  src={
-                    "https://cdn.penguin.co.uk/dam-assets/books/9781785299360/9781785299360-jacket-large.jpg"
-                  }
-                  height={300}
-                  width={300}
-                  className="w-[300px] h-[300px]"
-                  objectFit="cover"
-                  objectPosition="center"
-                  alt="image-1"
-                />
-              </div>
-              <div className="p-1 rounded-md bg-white border">
-                <Image
+                  style={{
+                    maxWidth: 300,
+                  }}
                   src={
                     "https://cdn.penguin.co.uk/dam-assets/books/9781785299360/9781785299360-jacket-large.jpg"
                   }
@@ -127,6 +102,7 @@ async function page() {
           </form>
         </div>
       </div>
+      <UploadImageModel />
     </>
   );
 }

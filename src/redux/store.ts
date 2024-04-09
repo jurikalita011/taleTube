@@ -1,10 +1,12 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { loadingSlice } from "./slices/loadingSlice";
 import { authSlice } from "./slices/authSlice";
+import { imageUploadModalSlice } from "./slices/uploadImagesSlice";
 
 const rootReducer = combineReducers({
   [loadingSlice.name]: loadingSlice.reducer,
   [authSlice.name]: authSlice.reducer,
+  [imageUploadModalSlice.name]: imageUploadModalSlice.reducer,
 });
 
 export const makeStore = () => {
