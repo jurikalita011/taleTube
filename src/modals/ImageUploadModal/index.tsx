@@ -1,46 +1,103 @@
 "use client";
 
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import {
-  toogleImageModal,
-  updateUploadImages,
-} from "@/redux/slices/uploadImagesSlice";
-import Image from "next/image";
-import React, {
-  ReactNode,
-  useRef,
-  useState,
-  type BaseSyntheticEvent,
-} from "react";
+import { toogleImageModal } from "@/redux/slices/imageUploadModalSlice";
+import NextImage from "next/image";
+import React, { useEffect, useState, type BaseSyntheticEvent } from "react";
 
+// react icons
 import { MdDelete } from "react-icons/md";
+import { FaInfoCircle } from "react-icons/fa";
 
-function index() {
-  const { isOpen: isImageModalOpen } = useAppSelector(
-    (state) => state.imageUploadModal
-  );
+//interfaces
+import { ImagesInterface } from "./interfaces";
 
-  const [selectedImages, setSelectedImages] = useState<any[]>([]);
+//helper
+import { getAspectRatio } from "@/helper";
+
+function ImageUploadModal() {
+  const { isOpen: isImageUploadModalOpen, requiredAspectRatio } =
+    useAppSelector((state) => state.image_upload_modal);
+
+  const [error, setError] = useState<boolean>(false);
+  const [selectedImages, setSelectedImages] = useState<ImagesInterface[]>([]);
 
   const dispatch = useAppDispatch();
 
-  const handleFileChange = (e: BaseSyntheticEvent) => {
-    console.log(e.target.files);
-    setSelectedImages(Array.from(e.target.files));
-    // dispatch(updateUploadImages({ images: e.target.files, isLoading: false }));
+  useEffect(() => {
+    if (isImageUploadModalOpen) {
+      setError(false);
+      for (let i = 0; i < selectedImages.length; i++) {
+        if (selectedImages[i].aspectRatio !== requiredAspectRatio) {
+          setError(true);
+          break;
+        }
+      }
+    }
+  }, [selectedImages]);
+
+  const getImageInfo = (file: File) => {
+    return new Promise<ImagesInterface>((resolve, reject) => {
+      const blob = new Blob([file], { type: file.type }); // create blob for the image
+      const reader = new FileReader();
+
+      // Set up FileReader onload event
+      reader.onload = (event: ProgressEvent<FileReader>) => {
+        if (event.target && event.target.result) {
+          const img = new Image();
+
+          // Set up Image onload event
+          img.onload = () => {
+            const aspectRatio = getAspectRatio(
+              img.naturalWidth,
+              img.naturalHeight
+            );
+            resolve({
+              blob,
+              aspectRatio,
+              width: img.naturalWidth,
+              height: img.naturalHeight,
+            });
+          };
+
+          img.src = event.target.result.toString();
+        }
+      };
+
+      // Read the file as a data URL
+      reader.readAsDataURL(blob);
+    });
+  };
+
+  const handleFileChange = async (e: BaseSyntheticEvent) => {
+    const imageFilesWithBlob = await Promise.all(
+      Array.from(e.target.files).map(async (file) => {
+        const imageBlobWithAspectRatio = await getImageInfo(file as File);
+        return imageBlobWithAspectRatio;
+      })
+    );
+    console.log(imageFilesWithBlob);
+    setSelectedImages(imageFilesWithBlob);
+    // dispatch(
+    //   updateUploadImages({ images: imageFilesWithBlob, isLoading: false })
+    // );
   };
 
   const handleModalClose = () => {
-    dispatch(toogleImageModal());
+    dispatch(toogleImageModal("16:9"));
   };
 
-  const handleCancelUpload = () => {};
+  const handleCancelUpload = () => {
+    dispatch(toogleImageModal("16:9"));
+    setSelectedImages([]);
+    setError(false);
+  };
 
   return (
     <>
-      {isImageModalOpen && (
-        <div className="fixed top-0 left-0 bg-[rgba(0,0,0,0.3)] w-screen h-screen flex justify-center items-center">
-          <div className="modal w-90 min-w-[350px] max-w-500 mx-auto my-10 bg-white rounded-lg shadow-md">
+      {isImageUploadModalOpen && (
+        <div className="fixed z-[999] top-0 left-0 bg-[rgba(0,0,0,0.3)] w-screen h-screen flex justify-center items-center">
+          <div className="modal w-90 min-w-[370px] max-w-500 mx-auto my-10 bg-white rounded-lg shadow-md">
             <div className="modal-header flex items-start justify-between px-6 py-4">
               <div className="logo-circle w-14 h-14 flex justify-center items-center rounded-full bg-purple-100">
                 <span className="text-green-500">
@@ -86,25 +143,53 @@ function index() {
               {selectedImages && selectedImages.length > 0 ? (
                 <>
                   {/* Render selected images */}
-                  <div className="mt-4 grid grid-cols-3 gap-4">
+                  <div className={"relative mt-4 grid grid-cols-3 gap-4 "}>
                     {selectedImages.map((file, index) => (
                       <div
-                        onClick={() => {
-                          const splice = selectedImages.splice(index, 1);
-                          setSelectedImages(splice);
-                        }}
                         key={index}
-                        className="border p-1 relative">
+                        style={{
+                          aspectRatio: requiredAspectRatio?.replace(":", "/"),
+                        }}
+                        onClick={() => {
+                          const imagesCopy = [...selectedImages];
+                          imagesCopy.splice(index, 1); // will return the spliced element
+                          setSelectedImages(imagesCopy);
+                        }}
+                        // aspect-[${requiredAspectRatio?.replace(
+                        //   ":",
+                        //   "/"
+                        // )}]
+                        className={`border w-[150px] h-auto p-1 relative rounded-md ${
+                          file.aspectRatio !== requiredAspectRatio
+                            ? "border-[#D93124] border-[1px]"
+                            : ""
+                        }`}>
+                        {file.aspectRatio !== requiredAspectRatio && (
+                          <>
+                            <div className="absolute backdrop-blur-[2px] top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.2)] flex items-center justify-center">
+                              <FaInfoCircle
+                                size={20}
+                                color="white"
+                                title="Only 16:9 files are allowed"
+                              />
+                            </div>
+                          </>
+                        )}
+
                         <MdDelete
                           size={25}
                           className="absolute m-1 bottom-0 right-0 bg-white border cursor-pointer"
                         />
-                        <Image
-                          src={URL.createObjectURL(file)}
+                        <NextImage
+                          src={URL.createObjectURL(file.blob)}
                           alt={`Image ${index}`}
                           height={150}
                           width={150}
-                          className="w-150 h-150 max-w-150"
+                          objectFit="cover"
+                          className={`w-[150px] h-auto aspect-[${requiredAspectRatio?.replace(
+                            ":",
+                            "/"
+                          )}]`}
                         />
                       </div>
                     ))}
@@ -113,7 +198,7 @@ function index() {
               ) : (
                 <label
                   htmlFor="file-input"
-                  className="cursor-pointer upload-area flex flex-col rounded-sm items-center w-full border-dashed border border-gray-400 hover:border-gray-500 focus:border-gray-500 px-12 py-16 hover:border-gray-500 focus:border-gray-500 ">
+                  className="cursor-pointer upload-area flex flex-col rounded-sm items-center w-full border-dashed border border-gray-400 hover:border-gray-500 focus:border-gray-500 px-12 py-16">
                   <span className="upload-area-icon w-9 h-9 fill-green-500">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -131,12 +216,12 @@ function index() {
                     </svg>
                   </span>
                   {/* <span className="upload-area-title mt-2 font-bold text-gray-800">
-              Drag file(s) here to upload.
-            </span>
-            <span className="upload-area-description text-gray-600 mt-2">
-              Alternatively, you can select a file by <br />
-              <strong>clicking here</strong>
-            </span> */}
+                        Drag file(s) here to upload.
+                      </span>
+                      <span className="upload-area-description text-gray-600 mt-2">
+                        Alternatively, you can select a file by <br />
+                        <strong>clicking here</strong>
+                      </span> */}
 
                   <input
                     type="file"
@@ -153,7 +238,15 @@ function index() {
                   </span>
                 </label>
               )}
+              {error && (
+                <div className="py-1">
+                  <span className="text-sm text-[#D93124]">
+                    Only {requiredAspectRatio} ration images are allowed
+                  </span>
+                </div>
+              )}
             </div>
+
             <div className="modal-footer px-6 py-4 flex justify-end">
               <button
                 onClick={handleCancelUpload}
@@ -173,4 +266,4 @@ function index() {
   );
 }
 
-export default index;
+export default ImageUploadModal;
