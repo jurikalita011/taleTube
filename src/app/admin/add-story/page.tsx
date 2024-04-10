@@ -2,14 +2,15 @@ import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import Image from "next/image";
 import React from "react";
 
-import UploadImageModel from "@/components/UploadImageModel";
-import ShowUploadModelButton from "@/components/UploadImageModel/ShowUploadModelButton";
+import ShowUploadModelButton from "@/components/UploadModelButton";
+import ImageUploadModal from "@/modals/ImageUploadModal";
+import SliderImagesWithCheckBox from "@/components/Add-Book/SliderImagesWithCheckBox";
 
 async function page() {
   return (
     <>
-      <div className="w-screen h-screen bg-[#F6F6F7]">
-        <div className="w-full h-full container">
+      <div className="w-full min-h-screen bg-[#F6F6F7]">
+        <div className="w-full container">
           <h2 className="font-extrabold text-2xl mb-4">Create product</h2>
           <form className="flex flex-col px-10 py-8 bg-white rounded-lg">
             <label className="text-[#4f4f4f] mb-2" htmlFor="bookTitle">
@@ -29,66 +30,20 @@ async function page() {
               name="bookDescription"
               className="min-h-15 h-15 w-full rounded-md border border-[rgba(0,0,0,0.1)] p-3 mb-4"
               placeholder="Type here"></textarea>
-            <label className="text-[#4f4f4f] mb-2">Images</label>
-            <div
-              style={{
-                WebkitOverflowScrolling: "touch",
-              }}
-              className="flex items-center mb-4 gap-x-5 overflow-x-auto scroll-snap-type-x-mandatory h-fit py-5">
-              <ShowUploadModelButton />
-              <div className="p-1 rounded-md bg-white border scroll-snap-align-left">
-                <Image
-                  style={{
-                    maxWidth: 300,
-                  }}
-                  src={
-                    "https://cdn.penguin.co.uk/dam-assets/books/9781785299360/9781785299360-jacket-large.jpg"
-                  }
-                  height={300}
-                  width={300}
-                  className="w-[300px] h-[300px]"
-                  objectFit="cover"
-                  objectPosition="center"
-                  alt="image-1"
-                />
-              </div>
-              <div className="p-1 rounded-md bg-white border scroll-snap-align-left">
-                <Image
-                  style={{
-                    maxWidth: 300,
-                  }}
-                  src={
-                    "https://cdn.penguin.co.uk/dam-assets/books/9781785299360/9781785299360-jacket-large.jpg"
-                  }
-                  height={300}
-                  width={300}
-                  className="w-[300px] h-[300px]"
-                  objectFit="cover"
-                  objectPosition="center"
-                  alt="image-1"
-                />
-              </div>
-              <div className="p-1 rounded-md bg-white border scroll-snap-align-left">
-                <Image
-                  style={{
-                    maxWidth: 300,
-                  }}
-                  src={
-                    "https://cdn.penguin.co.uk/dam-assets/books/9781785299360/9781785299360-jacket-large.jpg"
-                  }
-                  height={300}
-                  width={300}
-                  className="w-[300px] h-[300px]"
-                  objectFit="cover"
-                  objectPosition="center"
-                  alt="image-1"
-                />
-              </div>
-            </div>
+
+            <label className="text-[#4f4f4f] mb-2">Book Cover</label>
+            <ShowUploadModelButton aspectRation={"1.6:1"} />
+            <p className="mt-2 ">
+              Images must be PNG or JPEG and 1.6:1 aspect ratio
+            </p>
+
+            <div className="mb-4"></div>
+
+            <SliderImagesWithCheckBox />
           </form>
         </div>
       </div>
-      <UploadImageModel />
+      <ImageUploadModal />
     </>
   );
 }

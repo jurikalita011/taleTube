@@ -8,14 +8,14 @@ export default function Home() {
 
   console.log(user);
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+    <main className="flex flex-col items-center justify-between p-24">
       {typeof user === "undefined" ? (
         <div>
           <a href="/api/auth/login">Login</a>
         </div>
       ) : (
         <div>
-          <Link href="/dashboard">Dashboard</Link>
+          <Link href="/admin/add-story">Admin Panel</Link>
           <a href="/api/auth/logout">Logout</a>
         </div>
       )}
